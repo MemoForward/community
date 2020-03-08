@@ -1,7 +1,6 @@
 package study.memoforward.community.mapper;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 import study.memoforward.community.model.User;
 
@@ -12,4 +11,13 @@ public interface UserMapper {
             "(account_id, name, token, gmt_create, gmt_modified) " +
             "values (#{accountId}, #{name}, #{token}, #{gmtCreate}, #{gmtModified})")
     void insert(User user);
+
+    @Select("select * from user where token = #{token}")
+    User findByToken(@Param("token") String token);
+
+    @Select("select * from user where account_id = #{accountId}")
+    User findByAccountId(@Param("accountId") String accountId);
+
+    @Update("update user set token = #{token} where account_id = #{accountId}")
+    void updateToken(@Param("token") String token, @Param("accountId") String accountId);
 }
