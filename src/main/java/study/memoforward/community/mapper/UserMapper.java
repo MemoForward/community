@@ -8,8 +8,8 @@ import study.memoforward.community.model.User;
 @Mapper
 public interface UserMapper {
     @Insert("insert into user " +
-            "(account_id, name, token, gmt_create, gmt_modified) " +
-            "values (#{accountId}, #{name}, #{token}, #{gmtCreate}, #{gmtModified})")
+            "(account_id, name, token, gmt_create, gmt_modified, bio, avatar_url) " +
+            "values (#{accountId}, #{name}, #{token}, #{gmtCreate}, #{gmtModified}, #{bio}, #{avatarUrl})")
     void insert(User user);
 
     @Select("select * from user where token = #{token}")
@@ -20,4 +20,7 @@ public interface UserMapper {
 
     @Update("update user set token = #{token} where account_id = #{accountId}")
     void updateToken(@Param("token") String token, @Param("accountId") String accountId);
+
+    @Select("select * from user where id = #{userId}")
+    User getById(@Param("userId") int userId);
 }

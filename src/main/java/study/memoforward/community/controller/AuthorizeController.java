@@ -11,6 +11,7 @@ import study.memoforward.community.dto.GithubUser;
 import study.memoforward.community.mapper.UserMapper;
 import study.memoforward.community.model.User;
 import study.memoforward.community.provider.GithubProvider;
+import study.memoforward.community.service.UserService;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ import java.util.UUID;
 public class AuthorizeController {
 
     @Autowired
-    UserMapper userMapper;
+    UserService userService;
 
     @Autowired
     private GithubProvider githubProvider;
@@ -49,7 +50,7 @@ public class AuthorizeController {
         // 3.通过access_token获得github用户的信息并在数据库保存
         GithubUser githubUser = githubProvider.getUser(access_token);
         if (githubUser != null) {
-            User user = userMapper.findByAccountId(String.valueOf(githubUser.getId()));
+            User user = userService.findByAccountId(String.valueOf(githubUser.getId()));
             if (user == null) {
                 // 新用户，则加入数据库
                 user = new User();
@@ -59,13 +60,15 @@ public class AuthorizeController {
                 user.setName(githubUser.getName());
                 user.setGmtCreate(System.currentTimeMillis());
                 user.setGmtModified(user.getGmtCreate());
-                userMapper.insert(user);
+                user.setBio(githubUser.getBio());
+                user.setAvatarUrl(githubUser.getAvatar_url());
+                userService.insert(user);
                 response.addCookie(new Cookie("token", token));
             }else{
                 // 老用户，但是cookie失效了， 更新cookie
                 String token = UUID.randomUUID().toString();
                 String accountId = user.getAccountId();
-                userMapper.updateToken(token, accountId);
+                userService.updateToken(token, accountId);
                 response.addCookie(new Cookie("token", token));
             }
             return "redirect:/";

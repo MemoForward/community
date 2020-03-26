@@ -1,7 +1,5 @@
 package study.memoforward.community.dto;
 
-import sun.tracing.dtrace.DTraceProviderFactory;
-
 public class AccessTokenDTO {
     private String client_id;
     private String client_secret;
