@@ -1,32 +1,18 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
+
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>MemoForward's 社区</title>
-    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-          crossorigin="anonymous">
-    <!-- 可选的 Bootstrap 主题文件（一般不用引入） -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css"
-          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
-          crossorigin="anonymous">
-    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
-            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-            crossorigin="anonymous"></script>
-</head>
+
 <body>
+
 <!-- 导航条 -->
-<nav class="navbar navbar-default">
+<nav th:fragment="copy" class="navbar navbar-default">
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
                     data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                 <span class="sr-only">MemoForward's community</span>
             </button>
-            <a class="navbar-brand" href="#">PCB社区</a>
+            <a class="navbar-brand" href="/">PCB社区</a>
         </div>
 
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -37,12 +23,17 @@
                 </div>
                 <button type="submit" class="btn btn-default">Search</button>
             </form>
+
             <ul class="nav navbar-nav navbar-right">
+                <li th:if="${session.user != null}"><a href="/publish">提问</a></li>
                 <li class="dropdown" th:if="${session.user != null}">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                       aria-expanded="false" th:text="${session.user.name}"><span class="caret"></span></a>
+                       aria-expanded="false">
+                        <span th:text="${session.user.name}"></span>
+                        <span class="caret"></span>
+                    </a>
                     <ul class="dropdown-menu">
-                        <li><a href="#">消息中心</a></li>
+                        <li><a href="/profile/question">我的问题</a></li>
                         <li><a href="#">个人资料</a></li>
                         <li role="separator" class="divider"></li>
                         <li><a href="#">退出登录</a></li>
@@ -56,5 +47,7 @@
         </div>
     </div>
 </nav>
+
 </body>
+
 </html>

@@ -6,7 +6,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import study.memoforward.community.mapper.QuestionMapper;
 import study.memoforward.community.model.Question;
 import study.memoforward.community.model.User;
 import study.memoforward.community.service.QuestionService;
@@ -20,7 +19,7 @@ public class PublishController {
     QuestionService questionService;
 
     @GetMapping("/publish")
-    public String publish(){
+    public String publish() {
 //        System.out.println("进入publish...");
         return "publish";
     }
@@ -30,7 +29,7 @@ public class PublishController {
                             @RequestParam("description") String description,
                             @RequestParam("tag") String tag,
                             HttpServletRequest request,
-                            Model model){
+                            Model model) {
 
         // 发布内容记录
         model.addAttribute("title", title);
@@ -38,20 +37,20 @@ public class PublishController {
         model.addAttribute("tag", tag);
 
         // 发布是否合理
-        User user = (User)request.getSession().getAttribute("user");
-        if(user == null) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
             model.addAttribute("error", "用户未登录");
             return "publish";
         }
-        if(title == null || title == ""){
+        if (title == null || "".equals(title)) {
             model.addAttribute("error", "标题不能为空");
             return "publish";
         }
-        if(description == null || description == ""){
+        if (description == null || "".equals(description)) {
             model.addAttribute("error", "正文不能为空");
             return "publish";
         }
-        if(tag == null || tag == ""){
+        if (tag == null || "".equals(tag)) {
             model.addAttribute("error", "标签不能为空");
             return "publish";
         }

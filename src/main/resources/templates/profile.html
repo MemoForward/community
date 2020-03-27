@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>MemoForward's 社区</title>
+    <title th:text="${sectionName}"></title>
     <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css"
           integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
           crossorigin="anonymous">
-    <link rel="stylesheet" href="css/community.css" type="text/css">
+    <link rel="stylesheet" href="/css/community.css" type="text/css">
     <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
@@ -29,7 +29,7 @@
     <div class="row">
         <!-- 左边栏 -->
         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
-            <h2><span class="glyphicon glyphicon-list" aria-hidden="true"/> <label> 发现</label></h2>
+            <h2><span class="glyphicon glyphicon-list" aria-hidden="true"/> <label th:text="${sectionName}"></label></h2>
             <hr>
             <div class="media" th:each="q: ${pageDTO.questionDTOList}">
                 <div class="media-left">
@@ -51,32 +51,54 @@
                 </div>
             </div>
             <!-- 页码 -->
-            <nav aria-label="...">
+            <nav th:if="${section == 'question'}" aria-label="...">
                 <ul class="pagination">
                     <li th:if="${pageDTO.hasPre == false}" class="disabled">
                         <a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
                     </li>
                     <li th:if="${pageDTO.hasPre == true}">
-                        <a href="/getPage" th:href="@{/getPage(page=1)}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                        <a href="/profile/question" th:href="@{/profile/question(page=1)}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
                     </li>
                     <li th:each="page: ${pageDTO.pages}" th:class="${page == pageDTO.curPage} ? 'active':'' ">
-                        <a href="/getPage" th:href="@{/getPage(page=${page})}" th:text="${page}"></a>
+                        <a href="/profile/question" th:href="@{/profile/question(page=${page})}" th:text="${page}"></a>
                     </li>
                     <li th:if="${pageDTO.hasNext == false}" class="disabled">
                         <a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
                     </li>
                     <li th:if="${pageDTO.hasNext == true}">
-                        <a href="/getPage" th:href="@{/getPage(page=${pageDTO.totalPage})}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+                        <a href="/profile/question" th:href="@{/profile/question(page=${pageDTO.totalPage})}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+                    </li>
+                </ul>
+            </nav>
+            <nav th:if="${section == 'reply'}" aria-label="...">
+                <ul class="pagination">
+                    <li th:if="${pageDTO.hasPre == false}" class="disabled">
+                        <a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                    </li>
+                    <li th:if="${pageDTO.hasPre == true}">
+                        <a href="/profile/reply" th:href="@{/profile/reply(page=1)}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                    </li>
+                    <li th:each="page: ${pageDTO.pages}" th:class="${page == pageDTO.curPage} ? 'active':'' ">
+                        <a href="/profile/reply" th:href="@{/profile/reply(page=${page})}" th:text="${page}"></a>
+                    </li>
+                    <li th:if="${pageDTO.hasNext == false}" class="disabled">
+                        <a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+                    </li>
+                    <li th:if="${pageDTO.hasNext == true}">
+                        <a href="/profile/reply" th:href="@{/profile/reply(page=${pageDTO.totalPage})}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
                     </li>
                 </ul>
             </nav>
         </div>
         <!-- 右边栏 -->
         <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
-            <h3>热门话题</h3>
-            1. ------------<br>
-            2. ------------<br>
-            3. ------------<br>
+            <div class="list-group profile-section">
+                <a href="/profile/question" th:class="${section == 'question' ? 'list-group-item active' : 'list-group-item'}">我的问题</a>
+                <a href="/profile/reply" th:class="${section == 'reply' ? 'list-group-item active' : 'list-group-item'}">
+                    最新回复
+                    <span class="badge">14</span>
+                </a>
+            </div>
         </div>
     </div>
 

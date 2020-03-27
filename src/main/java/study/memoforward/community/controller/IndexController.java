@@ -1,9 +1,12 @@
 package study.memoforward.community.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import study.memoforward.community.dto.PageDTO;
 import study.memoforward.community.dto.QuestionDTO;
 import study.memoforward.community.model.User;
 import study.memoforward.community.service.QuestionService;
@@ -22,24 +25,20 @@ public class IndexController {
     @Autowired
     QuestionService questionService;
 
+    @Value("${index.showCounts}")
+    private Integer PAGELIMIT;
+
     @GetMapping("/")
     public String index(HttpServletRequest request,
-                        Model model){
-        Cookie[] cookies = request.getCookies();
-        if(cookies == null) return "index";
-        for(Cookie cookie: cookies) {
-            if (cookie.getName().equals("token")) {
-                String token = cookie.getValue();
-                User user = userService.findByToken(token);
-                if(user != null){
-                    request.getSession().setAttribute("user", user);
-                }
-                break;
-            }
-        }
+                        @RequestParam(value = "page", defaultValue = "1") Integer page){
+        return "forward:/getPage";
+    }
 
-        List<QuestionDTO> questionDTOList =  questionService.getList();
-        model.addAttribute("questionLists", questionDTOList);
+    @GetMapping("/getPage")
+    public String addPage(Model model,
+                          @RequestParam(value = "page", defaultValue = "1") Integer page){
+        PageDTO pageDTO =  questionService.getList(page, PAGELIMIT);
+        model.addAttribute("pageDTO", pageDTO);
         return "index";
     }
 }

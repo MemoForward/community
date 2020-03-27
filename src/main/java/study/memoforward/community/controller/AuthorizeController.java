@@ -50,6 +50,7 @@ public class AuthorizeController {
         // 3.通过access_token获得github用户的信息并在数据库保存
         GithubUser githubUser = githubProvider.getUser(access_token);
         if (githubUser != null) {
+//            System.out.println(githubUser);
             User user = userService.findByAccountId(String.valueOf(githubUser.getId()));
             if (user == null) {
                 // 新用户，则加入数据库
@@ -63,13 +64,18 @@ public class AuthorizeController {
                 user.setBio(githubUser.getBio());
                 user.setAvatarUrl(githubUser.getAvatar_url());
                 userService.insert(user);
-                response.addCookie(new Cookie("token", token));
+                Cookie cookie = new Cookie("pcbUser", token);
+                cookie.setMaxAge(60 * 24 * 24 * 15);
+                response.addCookie(cookie);
             }else{
                 // 老用户，但是cookie失效了， 更新cookie
                 String token = UUID.randomUUID().toString();
                 String accountId = user.getAccountId();
                 userService.updateToken(token, accountId);
-                response.addCookie(new Cookie("token", token));
+                Cookie cookie = new Cookie("pcbUser", token);
+                cookie.setMaxAge(60 * 24 * 24 * 15);
+                response.addCookie(cookie);
+                response.addCookie(cookie);
             }
             return "redirect:/";
         } else {
