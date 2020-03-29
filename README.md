@@ -10,3 +10,10 @@
 ## 技术栈
 - github
 - SpringBoot
+
+## 使用命令
+
+```bash
+mvn flyway:migrate
+mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate
+```

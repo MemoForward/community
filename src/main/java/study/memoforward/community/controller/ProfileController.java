@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import study.memoforward.community.dto.PageDTO;
+import study.memoforward.community.exception.CustomizeError;
+import study.memoforward.community.exception.CustomizeException;
 import study.memoforward.community.model.User;
 import study.memoforward.community.service.QuestionService;
 import study.memoforward.community.service.UserService;
@@ -29,29 +31,30 @@ public class ProfileController {
     public String profile(@PathVariable(name = "action") String action,
                           HttpServletRequest request,
                           Model model,
+                          @RequestParam(value = "id", required = false) Integer id,
                           @RequestParam(value = "page", defaultValue = "1") Integer page){
-        User user = (User)request.getSession().getAttribute("user");
-        if(user == null){
-            model.addAttribute("error","用户未登录");
-            return "404";
+        User user = null;
+        if(id == null){
+            user = (User)request.getSession().getAttribute("user");
+        }else{
+            user = userService.findById(id);
         }
+        if(user == null) {throw new CustomizeException(CustomizeError.USER_NOT_LOGIN);}
+
         if("question".equals(action)){
             model.addAttribute("section", "question");
-            model.addAttribute("sectionName", "我的提问");
-            return "forward:/profile/getQues";
+            model.addAttribute("sectionName", user.getName() + "的提问");
+            PageDTO pageDTO = questionService.getList(user, page, PAGELIMIT);
+            model.addAttribute("id", user.getId());
+            model.addAttribute("pageDTO", pageDTO);
+            return "profile";
         }else if("reply".equals(action)){
             model.addAttribute("section", "reply");
             model.addAttribute("sectionName","最新回复");
-            return "forward:/profile/getRep";
-        }else if("getQues".equals(action)){
-            PageDTO pageDTO = questionService.getList(user, page, PAGELIMIT);
-            model.addAttribute("pageDTO", pageDTO);
-            return "profile";
-        }else if("getRep".equals(action)){
             PageDTO pageDTO = null;
             model.addAttribute("pageDTO", pageDTO);
             return "profile";
         }
-        return "404";
+        throw new CustomizeException(CustomizeError.URL_NOT_FOUND);
     }
 }

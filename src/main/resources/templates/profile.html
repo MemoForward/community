@@ -29,23 +29,28 @@
     <div class="row">
         <!-- 左边栏 -->
         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
-            <h2><span class="glyphicon glyphicon-list" aria-hidden="true"/> <label th:text="${sectionName}"></label></h2>
+            <h2><span class="glyphicon glyphicon-list" aria-hidden="true"/> <label th:text="${sectionName}"></label>
+            </h2>
             <hr>
             <div class="media" th:each="q: ${pageDTO.questionDTOList}">
                 <div class="media-left">
-                    <a href="#">
+                    <a href="/question" th:href="'/question' + ${q.id}">
                         <img class="media-object img-circle img-size"
                              th:src="${q.user.avatarUrl}">
                     </a>
                 </div>
                 <div class="media-body">
-                    <h4 class="media-heading" th:text="${q.title}"></h4>
+                    <h4 class="media-heading">
+                        <a href="/question" th:href="'/question/' + ${q.id}" th:text="${q.title}"></a>
+                    </h4>
                     <!--                    <span th:text="${q.description}"></span>-->
-                    <span class="text_info">
+                    <span class="text-info">
                         <span th:text="${q.commentCount} ?: 0"></span>回复·
                         <span th:text="${q.viewCount} ?: 0"></span>浏览·
-                        <!--                        <span th:text="${q.likeCount} ?: 0"></span>小时前-->
-                        <span th:text="${#dates.format(q.gmtCreate, 'yyyy-MM-dd HH:mm')}"></span>发布
+                        <span th:if="${q.gmtModified != q.gmtCreate}"
+                              th:text="${#dates.format(q.gmtModified, 'yyyy-MM-dd HH:mm')} + ' 编辑'"></span>
+                        <span th:if="${q.gmtModified == q.gmtCreate}"
+                              th:text="${#dates.format(q.gmtCreate, 'yyyy-MM-dd HH:mm')} + ' 发布'"></span>
                         <hr>
                     </span>
                 </div>
@@ -57,16 +62,18 @@
                         <a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
                     </li>
                     <li th:if="${pageDTO.hasPre == true}">
-                        <a href="/profile/question" th:href="@{/profile/question(page=1)}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                        <a href="/profile/question" th:href="@{/profile/question(page=1,id=${id})}" aria-label="Previous"><span
+                                aria-hidden="true">&laquo;</span></a>
                     </li>
                     <li th:each="page: ${pageDTO.pages}" th:class="${page == pageDTO.curPage} ? 'active':'' ">
-                        <a href="/profile/question" th:href="@{/profile/question(page=${page})}" th:text="${page}"></a>
+                        <a href="/profile/question" th:href="@{/profile/question(page=${page},id=${id})}" th:text="${page}"></a>
                     </li>
                     <li th:if="${pageDTO.hasNext == false}" class="disabled">
                         <a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
                     </li>
                     <li th:if="${pageDTO.hasNext == true}">
-                        <a href="/profile/question" th:href="@{/profile/question(page=${pageDTO.totalPage})}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+                        <a href="/profile/question" th:href="@{/profile/question(page=${pageDTO.totalPage},id=${id})}"
+                           aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
                     </li>
                 </ul>
             </nav>
@@ -76,7 +83,8 @@
                         <a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
                     </li>
                     <li th:if="${pageDTO.hasPre == true}">
-                        <a href="/profile/reply" th:href="@{/profile/reply(page=1)}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                        <a href="/profile/reply" th:href="@{/profile/reply(page=1)}" aria-label="Previous"><span
+                                aria-hidden="true">&laquo;</span></a>
                     </li>
                     <li th:each="page: ${pageDTO.pages}" th:class="${page == pageDTO.curPage} ? 'active':'' ">
                         <a href="/profile/reply" th:href="@{/profile/reply(page=${page})}" th:text="${page}"></a>
@@ -85,16 +93,19 @@
                         <a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
                     </li>
                     <li th:if="${pageDTO.hasNext == true}">
-                        <a href="/profile/reply" th:href="@{/profile/reply(page=${pageDTO.totalPage})}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+                        <a href="/profile/reply" th:href="@{/profile/reply(page=${pageDTO.totalPage})}"
+                           aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
                     </li>
                 </ul>
             </nav>
         </div>
         <!-- 右边栏 -->
-        <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+        <div th:if="${session.user != null}" class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
             <div class="list-group profile-section">
-                <a href="/profile/question" th:class="${section == 'question' ? 'list-group-item active' : 'list-group-item'}">我的问题</a>
-                <a href="/profile/reply" th:class="${section == 'reply' ? 'list-group-item active' : 'list-group-item'}">
+                <a href="/profile/question"
+                   th:class="${section == 'question' && id == session.user.id ? 'list-group-item active' : 'list-group-item'}">我的问题</a>
+                <a href="/profile/reply"
+                   th:class="${section == 'reply' ? 'list-group-item active' : 'list-group-item'}">
                     最新回复
                     <span class="badge">14</span>
                 </a>

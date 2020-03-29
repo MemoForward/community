@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css"
           integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
           crossorigin="anonymous">
-    <link rel="stylesheet" href="css/community.css" type="text/css">
+    <link rel="stylesheet" href="/css/community.css" type="text/css">
     <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
@@ -33,19 +33,24 @@
             <hr>
             <div class="media" th:each="q: ${pageDTO.questionDTOList}">
                 <div class="media-left">
-                    <a href="#">
+                    <a href="/question" th:href="@{'/question/'+${q.id}}">
                         <img class="media-object img-circle img-size"
                              th:src="${q.user.avatarUrl}">
                     </a>
                 </div>
                 <div class="media-body">
-                    <h4 class="media-heading" th:text="${q.title}"></h4>
+                    <h4 class="media-heading">
+                        <a href="/question" th:href="'/question/'+ ${q.id}" th:text="${q.title}"></a>
+                    </h4>
                     <!--                    <span th:text="${q.description}"></span>-->
-                    <span class="text_info">
+                    <span class="text-info">
                         <span th:text="${q.commentCount} ?: 0"></span>回复·
                         <span th:text="${q.viewCount} ?: 0"></span>浏览·
                         <!--                        <span th:text="${q.likeCount} ?: 0"></span>小时前-->
-                        <span th:text="${#dates.format(q.gmtCreate, 'yyyy-MM-dd HH:mm')}"></span>发布
+                        <span th:if="${q.gmtModified != q.gmtCreate}"
+                              th:text="${#dates.format(q.gmtModified, 'yyyy-MM-dd HH:mm')} + ' 编辑'"></span>
+                        <span th:if="${q.gmtModified == q.gmtCreate}"
+                              th:text="${#dates.format(q.gmtCreate, 'yyyy-MM-dd HH:mm')} + ' 发布'"></span>
                         <hr>
                     </span>
                 </div>
@@ -66,7 +71,8 @@
                         <a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
                     </li>
                     <li th:if="${pageDTO.hasNext == true}">
-                        <a href="/getPage" th:href="@{/getPage(page=${pageDTO.totalPage})}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+                        <a href="/getPage" th:href="@{/getPage(page=${pageDTO.totalPage})}" aria-label="Next"><span
+                                aria-hidden="true">&raquo;</span></a>
                     </li>
                 </ul>
             </nav>

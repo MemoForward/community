@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import study.memoforward.community.dto.AccessTokenDTO;
 import study.memoforward.community.dto.GithubUser;
+import study.memoforward.community.exception.CustomizeError;
+import study.memoforward.community.exception.CustomizeException;
 import study.memoforward.community.mapper.UserMapper;
 import study.memoforward.community.model.User;
 import study.memoforward.community.provider.GithubProvider;
@@ -75,12 +77,26 @@ public class AuthorizeController {
                 Cookie cookie = new Cookie("pcbUser", token);
                 cookie.setMaxAge(60 * 24 * 24 * 15);
                 response.addCookie(cookie);
-                response.addCookie(cookie);
             }
             return "redirect:/";
         } else {
-            //登录失败
-            return null;
+            throw new CustomizeException(CustomizeError.LOGIN_FAILED);
         }
     }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request,
+                         HttpServletResponse response){
+        request.getSession().removeAttribute("user");
+        Cookie[] cookies = request.getCookies();
+        for(Cookie cookie: cookies){
+            if("pcbUser".equals(cookie.getName())){
+                cookie.setMaxAge(0);
+                response.addCookie(cookie);
+                break;
+            }
+        }
+        return "redirect:/";
+    }
+
 }

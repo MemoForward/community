@@ -23,7 +23,7 @@ public class SessionInterceptor implements HandlerInterceptor {
         Cookie[] cookies = request.getCookies();
         if(cookies == null) return true;
         for(Cookie cookie: cookies) {
-            if (cookie.getName().equals("pcbUser")) {
+            if ("pcbUser".equals(cookie.getName())) {
                 String token = cookie.getValue();
                 User user = userService.findByToken(token);
                 if(user != null){

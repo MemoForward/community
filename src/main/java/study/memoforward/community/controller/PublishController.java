@@ -6,11 +6,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import study.memoforward.community.dto.QuestionDTO;
+import study.memoforward.community.exception.CustomizeError;
+import study.memoforward.community.exception.CustomizeException;
 import study.memoforward.community.model.Question;
 import study.memoforward.community.model.User;
 import study.memoforward.community.service.QuestionService;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class PublishController {
@@ -20,7 +24,25 @@ public class PublishController {
 
     @GetMapping("/publish")
     public String publish() {
-//        System.out.println("进入publish...");
+        return "publish";
+    }
+
+    @GetMapping("/edit")
+    public String edit(@RequestParam("id") Integer id,
+                       HttpServletRequest request,
+                       Model model){
+
+        // 在后端检验恶意修改数据，防止有人直接通过url修改问题
+        Question question = questionService.findById(id);
+        User user = (User)request.getSession().getAttribute("user");
+        if(user == null) throw new CustomizeException(CustomizeError.URL_NOT_FOUND);
+        if(!user.getId().equals(question.getCreator())) throw new CustomizeException(CustomizeError.USER_NO_PERMISSION);
+
+        // 执行修改逻辑
+        model.addAttribute("title", question.getTitle());
+        model.addAttribute("description", question.getDescription());
+        model.addAttribute("tag", question.getTag());
+        model.addAttribute("id", id);
         return "publish";
     }
 
@@ -28,6 +50,7 @@ public class PublishController {
     public String doPublish(@RequestParam("title") String title,
                             @RequestParam("description") String description,
                             @RequestParam("tag") String tag,
+                            @RequestParam(value = "id", required = false) Integer id,
                             HttpServletRequest request,
                             Model model) {
 
@@ -55,15 +78,25 @@ public class PublishController {
             return "publish";
         }
 
-        // 发布逻辑
-        Question question = new Question();
-        question.setCreator(user.getId());
-        question.setGmtCreate(System.currentTimeMillis());
-        question.setGmtModified(question.getGmtCreate());
-        question.setTitle(title);
-        question.setDescription(description);
-        question.setTag(tag);
-        questionService.create(question);
-        return "redirect:/";
+        if(id == null){
+            // 发布逻辑
+            Question question = new Question();
+            question.setCreator(user.getId());
+            question.setGmtCreate(System.currentTimeMillis());
+            question.setGmtModified(question.getGmtCreate());
+            question.setTitle(title);
+            question.setDescription(description);
+            question.setTag(tag);
+            questionService.create(question);
+            return "redirect:/";
+        }else{
+            Question question = questionService.findById(id);
+            question.setGmtModified(System.currentTimeMillis());
+            question.setTitle(title);
+            question.setDescription(description);
+            question.setTag(tag);
+            questionService.edit(question);
+        }return "redirect:/";
+
     }
 }
