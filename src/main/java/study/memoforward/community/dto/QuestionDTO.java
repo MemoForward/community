@@ -3,40 +3,23 @@ package study.memoforward.community.dto;
 import study.memoforward.community.model.User;
 
 public class QuestionDTO {
-    private Integer id;
+    private Long id;
     private String title;
     private String description;
     private String tag;
     private Long gmtCreate;
     private Long gmtModified;
-    private Integer creator;
+    private Long creator;
     private Integer viewCount;
     private Integer likeCount;
     private Integer commentCount;
     private User user;
 
-    @Override
-    public String toString() {
-        return "QuestionDTO{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", tag='" + tag + '\'' +
-                ", gmtCreate=" + gmtCreate +
-                ", gmtModified=" + gmtModified +
-                ", creator=" + creator +
-                ", viewCount=" + viewCount +
-                ", likeCount=" + likeCount +
-                ", commentCount=" + commentCount +
-                ", user=" + user +
-                '}';
-    }
-
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -80,11 +63,11 @@ public class QuestionDTO {
         this.gmtModified = gmtModified;
     }
 
-    public Integer getCreator() {
+    public Long getCreator() {
         return creator;
     }
 
-    public void setCreator(Integer creator) {
+    public void setCreator(Long creator) {
         this.creator = creator;
     }
 
@@ -118,5 +101,22 @@ public class QuestionDTO {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @Override
+    public String toString() {
+        return "QuestionDTO{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", tag='" + tag + '\'' +
+                ", gmtCreate=" + gmtCreate +
+                ", gmtModified=" + gmtModified +
+                ", creator=" + creator +
+                ", viewCount=" + viewCount +
+                ", likeCount=" + likeCount +
+                ", commentCount=" + commentCount +
+                ", user=" + user +
+                '}';
     }
 }

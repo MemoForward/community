@@ -4,8 +4,8 @@ import java.awt.image.AreaAveragingScaleFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PageDTO {
-    private List<QuestionDTO> questionDTOList;
+public class PageDTO<T> {
+    private List<T> list;
     private boolean hasPre = true;
     private boolean hasNext = true;
     private Integer totalPage;
@@ -23,12 +23,12 @@ public class PageDTO {
         for (int i = page - head; i <= page + end; i++) pages.add(i);
     }
 
-    public List<QuestionDTO> getQuestionDTOList() {
-        return questionDTOList;
+    public List<T> getList() {
+        return list;
     }
 
-    public void setQuestionDTOList(List<QuestionDTO> questionDTOList) {
-        this.questionDTOList = questionDTOList;
+    public void setList(List<T> list) {
+        this.list = list;
     }
 
     public boolean isHasPre() {
@@ -74,7 +74,7 @@ public class PageDTO {
     @Override
     public String toString() {
         return "PageDTO{" +
-                "questionDTOList=" + questionDTOList +
+                "list=" + list +
                 ", hasPre=" + hasPre +
                 ", hasNext=" + hasNext +
                 ", totalPage=" + totalPage +

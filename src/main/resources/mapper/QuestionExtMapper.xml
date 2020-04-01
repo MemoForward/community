@@ -21,6 +21,29 @@
     <update id="incViewCount" parameterType="study.memoforward.community.model.Question">
         update QUESTION
         set VIEW_COUNT = VIEW_COUNT + #{viewCount,jdbcType=INTEGER}
-        where ID = #{id,jdbcType=INTEGER}
+        where ID = #{id}
     </update>
+
+    <update id="incCommentCount" parameterType="study.memoforward.community.model.Question">
+        update QUESTION
+        set COMMENT_COUNT = COMMENT_COUNT + #{commentCount,jdbcType=INTEGER}
+        where ID = #{id}
+    </update>
+
+    <select id="relatedSelectByTag" parameterType="study.memoforward.community.dto.QuestionDTO"
+            resultMap="BaseResultMap">
+        select *
+        from QUESTION
+        where ID != #{id}
+          AND TAG REGEXP #{tag}
+        LIMIT 10 OFFSET 0
+    </select>
+
+    <select id="countRelatedQuestion" parameterType="study.memoforward.community.dto.QuestionDTO"
+            resultType="java.lang.Long">
+        select count(*) from QUESTION
+        where ID != #{id}
+          AND TAG REGEXP #{tag}
+    </select>
+
 </mapper>

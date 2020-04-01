@@ -1,5 +1,6 @@
 package study.memoforward.community.service;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +33,13 @@ public class QuestionService {
     UserMapper userMapper;
 
     public void create(Question question){
-
+        question.setViewCount(0);
+        question.setCommentCount(0);
+        question.setLikeCount(0);
         questionMapper.insert(question);
     }
 
-    public PageDTO getList(Integer page, Integer pageLimit) {
+    public PageDTO<QuestionDTO> getList(Integer page, Integer pageLimit) {
         Integer totalNum = (int)questionMapper.countByExample(new QuestionExample());
         Integer totalPage = totalNum % pageLimit == 0 ? totalNum / pageLimit : totalNum / pageLimit + 1;
         if(page < 1) page = 1;
@@ -46,21 +49,21 @@ public class QuestionService {
         questionExample.setOrderByClause("gmt_modified desc");
         List<Question> questionList = questionMapper.selectByExampleWithRowbounds(questionExample, new RowBounds(offset, pageLimit));
         List<QuestionDTO> questionDTOList = new ArrayList<>();
-        PageDTO pageDTO = new PageDTO();
+        PageDTO<QuestionDTO> pageDTO = new PageDTO<>();
         for(Question q: questionList){
             QuestionDTO questionDTO = new QuestionDTO();
             BeanUtils.copyProperties(q, questionDTO);
-            int userId = q.getCreator();
+            long userId = q.getCreator();
             User user = userMapper.selectByPrimaryKey(userId);
             questionDTO.setUser(user);
             questionDTOList.add(questionDTO);
         }
-        pageDTO.setQuestionDTOList(questionDTOList);
+        pageDTO.setList(questionDTOList);
         pageDTO.setPage(page, totalPage);
         return pageDTO;
     }
 
-    public PageDTO getList(User user, Integer page, Integer pageLimit) {
+    public PageDTO<QuestionDTO> getList(User user, Integer page, Integer pageLimit) {
         QuestionExample questionExample = new QuestionExample();
         questionExample.createCriteria().andCreatorEqualTo(user.getId());
         Integer totalNum = (int)questionMapper.countByExample(questionExample);
@@ -73,19 +76,19 @@ public class QuestionService {
         questionExample.createCriteria().andCreatorEqualTo(user.getId());
         List<Question> questionList = questionMapper.selectByExampleWithRowbounds(questionExample, new RowBounds(offset, pageLimit));
         List<QuestionDTO> questionDTOList = new ArrayList<>();
-        PageDTO pageDTO = new PageDTO();
+        PageDTO<QuestionDTO> pageDTO = new PageDTO<>();
         for(Question q: questionList){
             QuestionDTO questionDTO = new QuestionDTO();
             BeanUtils.copyProperties(q, questionDTO);
             questionDTO.setUser(user);
             questionDTOList.add(questionDTO);
         }
-        pageDTO.setQuestionDTOList(questionDTOList);
+        pageDTO.setList(questionDTOList);
         pageDTO.setPage(page, totalPage);
         return pageDTO;
     }
 
-    public QuestionDTO getById(Integer id) {
+    public QuestionDTO getById(Long id) {
         QuestionDTO questionDTO = new QuestionDTO();
         Question question = questionMapper.selectByPrimaryKey(id);
         if(question == null) throw new CustomizeException(CustomizeError.QUESTION_NOT_FOUND);
@@ -96,21 +99,35 @@ public class QuestionService {
     }
 
 
-    public Question findById(Integer id) {
+    public Question findById(Long id) {
         Question question = questionMapper.selectByPrimaryKey(id);
         if(question == null) throw new CustomizeException(CustomizeError.QUESTION_NOT_FOUND);
         return question;
     }
 
     public void edit(Question question) {
-        questionMapper.updateByPrimaryKeySelective(question);
+        int i = questionMapper.updateByPrimaryKeySelective(question);
+        if(i == 0) throw new CustomizeException(CustomizeError.URL_NOT_FOUND);
+        return;
     }
 
-    public void incViewCount(Integer id) {
+    public void incViewCount(Long id) {
         // 我觉得这里没有解决高并发啊....就当练手了
         Question record = new Question();
         record.setViewCount(1);
         record.setId(id);
         questionExtMapper.incViewCount(record);
+    }
+
+    public List<Question> getRelatedQuestions(QuestionDTO questionDTO) {
+        if(StringUtils.isBlank(questionDTO.getTag())){
+            return new ArrayList<>();
+        }
+        String tag = questionDTO.getTag();
+        String[] tags = tag.split(",|，");
+        tag = StringUtils.joinWith("|",tags);
+        questionDTO.setTag(tag);
+        List<Question> questionDTOList = questionExtMapper.relatedSelectByTag(questionDTO);
+        return questionDTOList;
     }
 }

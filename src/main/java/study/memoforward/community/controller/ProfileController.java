@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import study.memoforward.community.dto.PageDTO;
+import study.memoforward.community.dto.QuestionDTO;
 import study.memoforward.community.exception.CustomizeError;
 import study.memoforward.community.exception.CustomizeException;
 import study.memoforward.community.model.User;
@@ -31,7 +32,7 @@ public class ProfileController {
     public String profile(@PathVariable(name = "action") String action,
                           HttpServletRequest request,
                           Model model,
-                          @RequestParam(value = "id", required = false) Integer id,
+                          @RequestParam(value = "id", required = false) Long id,
                           @RequestParam(value = "page", defaultValue = "1") Integer page){
         User user = null;
         if(id == null){
@@ -44,7 +45,7 @@ public class ProfileController {
         if("question".equals(action)){
             model.addAttribute("section", "question");
             model.addAttribute("sectionName", user.getName() + "的提问");
-            PageDTO pageDTO = questionService.getList(user, page, PAGELIMIT);
+            PageDTO<QuestionDTO> pageDTO = questionService.getList(user, page, PAGELIMIT);
             model.addAttribute("id", user.getId());
             model.addAttribute("pageDTO", pageDTO);
             return "profile";

@@ -32,9 +32,9 @@
             <h2><span class="glyphicon glyphicon-list" aria-hidden="true"/> <label th:text="${sectionName}"></label>
             </h2>
             <hr>
-            <div class="media" th:each="q: ${pageDTO.questionDTOList}">
+            <div class="media" th:each="q: ${pageDTO.list}">
                 <div class="media-left">
-                    <a href="/question" th:href="'/question' + ${q.id}">
+                    <a href="/question" th:href="'/question/' + ${q.id}">
                         <img class="media-object img-circle img-size"
                              th:src="${q.user.avatarUrl}">
                     </a>
@@ -47,6 +47,7 @@
                     <span class="text-info">
                         <span th:text="${q.commentCount} ?: 0"></span>回复·
                         <span th:text="${q.viewCount} ?: 0"></span>浏览·
+                        作者：<span th:text="${q.user.name}"></span> |
                         <span th:if="${q.gmtModified != q.gmtCreate}"
                               th:text="${#dates.format(q.gmtModified, 'yyyy-MM-dd HH:mm')} + ' 编辑'"></span>
                         <span th:if="${q.gmtModified == q.gmtCreate}"

@@ -37,7 +37,7 @@ public class IndexController {
     @GetMapping("/getPage")
     public String addPage(Model model,
                           @RequestParam(value = "page", defaultValue = "1") Integer page){
-        PageDTO pageDTO =  questionService.getList(page, PAGELIMIT);
+        PageDTO<QuestionDTO> pageDTO =  questionService.getList(page, PAGELIMIT);
         model.addAttribute("pageDTO", pageDTO);
         return "index";
     }

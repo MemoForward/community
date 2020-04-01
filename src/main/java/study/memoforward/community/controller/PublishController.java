@@ -28,7 +28,7 @@ public class PublishController {
     }
 
     @GetMapping("/edit")
-    public String edit(@RequestParam("id") Integer id,
+    public String edit(@RequestParam("id") Long id,
                        HttpServletRequest request,
                        Model model){
 
@@ -50,7 +50,7 @@ public class PublishController {
     public String doPublish(@RequestParam("title") String title,
                             @RequestParam("description") String description,
                             @RequestParam("tag") String tag,
-                            @RequestParam(value = "id", required = false) Integer id,
+                            @RequestParam(value = "id", required = false) Long id,
                             HttpServletRequest request,
                             Model model) {
 
@@ -91,6 +91,8 @@ public class PublishController {
             return "redirect:/";
         }else{
             Question question = questionService.findById(id);
+            if(!user.getId().equals(question.getCreator()))
+                throw new CustomizeException((CustomizeError.USER_NO_PERMISSION));
             question.setGmtModified(System.currentTimeMillis());
             question.setTitle(title);
             question.setDescription(description);

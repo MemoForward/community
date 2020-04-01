@@ -3,6 +3,7 @@
 <head>
     <title th:text="${questionDTO.title}"></title>
     <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+    <script src="/js/community.js" type="application/javascript"></script>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
@@ -29,24 +30,143 @@
     <div class="row">
         <!-- 左边栏 -->
         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
-            <h3><span th:text="${questionDTO.title}"></span></h3>
-            <span class="text-info">
-                <span><a class="text-info" href="/" th:text="PCB社区"></a></span> | 作者
-                <span><a href="/profile/question" th:href="@{/profile/question(id=${questionDTO.creator})}"
-                         th:text="${questionDTO.user.name}"></a></span> | 发布于
-                <span th:text="${#dates.format(questionDTO.gmtCreate, 'yyyy-MM-dd HH:mm')}"></span> | 阅读数:
-                <span th:text="${questionDTO.viewCount}? ${questionDTO.viewCount}: 1"></span>
-            </span>
-            <hr>
-            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" th:text="${questionDTO.description}">
+            <!-- 正文 -->
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <h2><span th:text="${questionDTO.title}"></span></h2>
+                <span class="text-info">
+                    <span><a class="text-info" href="/" th:text="PCB社区"></a></span> | 作者
+                    <span><a href="/profile/question" th:href="@{/profile/question(id=${questionDTO.creator})}"
+                             th:text="${questionDTO.user.name}"></a></span> | 发布于
+                    <span th:text="${#dates.format(questionDTO.gmtCreate, 'yyyy-MM-dd HH:mm')}"></span> | 阅读数:
+                    <span th:text="${questionDTO.viewCount}"></span>
+                </span>
+                <hr>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" th:text="${questionDTO.description}">
+                </div>
+                <br>
+                <hr>
+                <!-- 标签 -->
+                <span style="padding-right: 5px" th:each="tag: ${questionDTO.tag.split('\|')}">
+                   <span class="glyphicon glyphicon-tags"></span>
+                    <span class="label label-info" th:text="${tag}"></span>
+                </span>
+                <!-- end 标签 -->
+                <a th:if="${session.user != null && session.user.id == questionDTO.creator}"
+                   class="btn-publish text-info"
+                   href="/edit" th:href="@{/edit(id=${questionDTO.id})}">
+                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                    编辑
+                </a><br>
+                <hr>
             </div>
-            <br>
-            <hr>
-            <a th:if="${session.user != null && session.user.id == questionDTO.creator}" class="btn-publish text-info"
-               href="/edit" th:href="@{/edit(id=${questionDTO.id})}">
-                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                编辑
-            </a>
+            <!-- 问题评论 -->
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <h3 class="media-heading">
+                    <span th:text="${questionDTO.commentCount}"></span>个回复
+                </h3>
+                <hr>
+                <div class="media comment-border" th:each="commentDTO: ${pageDTO.list}">
+                    <div class="media-left">
+                        <img class="media-object img-rounded img-size" th:src="${commentDTO.user.avatarUrl}">
+                    </div>
+                    <div class="media-body">
+                        <h5 class="media-heading comment-user-name">
+                            <span th:text="${commentDTO.user.name}"></span>
+                        </h5>
+                        <div class="comment-content" th:text="${commentDTO.content}"></div>
+                        <div>
+                            <span class="comment-extra" aria-hidden="true">
+                                <a href="#" class="glyphicon glyphicon-thumbs-up"></a>
+                                <label th:text="${commentDTO.likeCount}"></label>
+                            </span>
+                            <span class="comment-extra" aria-hidden="true">
+                                <a class="glyphicon glyphicon-comment" th:id="'active-'+${commentDTO.id}"
+                                   th:data-id="${commentDTO.id}" onclick="collapseComments(this, 1)">
+                                </a>
+                                <label th:id="'commentIcon-'+${commentDTO.id}"
+                                       th:text="${commentDTO.commentCount}"></label>
+
+                            </span>
+                            <span class="text-info pull-right " style="margin-top: 5px"
+                                  th:id="'commentDate-'+${commentDTO.id}"
+                                  th:text="${#dates.format(commentDTO.gmtCreate, 'yyyy-MM-dd HH:mm')}"></span>
+                            <!-- 二级评论 -->
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 comment-second-border collapse"
+                                 th:id="'comment-'+${commentDTO.id}">
+                                <!-- jq 自动追加评论-->
+                                <!-- end自动追加 -->
+                                <!-- 页码 -->
+                                <nav class="comment-page">
+                                    <ul class="pagination">
+                                        <!-- jQuery 动态添加页码-->
+                                        <div class="hidden" th:id="'QflagDiv-'+${commentDTO.id}"></div>
+                                    </ul>
+                                </nav>
+                                <form class="form-inline" id="form2second">
+                                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 comment">
+                                        <input type="text" th:id="'secondCommentText-'+${commentDTO.id}"
+                                               class="comment-text" placeholder="评论一下">
+                                        <button type="button" class="btn btn-success btn-publish"
+                                                onclick="postSecondComment(this)" th:data-second-id="${commentDTO.id}">
+                                            回复
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 页码 -->
+            <nav th:if="${questionDTO.commentCount != 0}" class="comment-page">
+                <ul class="pagination">
+                    <li th:if="${pageDTO.hasPre == false}" class="disabled">
+                        <a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                    </li>
+                    <li th:if="${pageDTO.hasPre == true}">
+                        <a href="/question" th:href="@{'/question/' + ${questionDTO.id}(page=1)}" aria-label="Previous"><span
+                                aria-hidden="true">&laquo;</span></a>
+                    </li>
+                    <li th:each="page: ${pageDTO.pages}" th:class="${page == pageDTO.curPage} ? 'active':'' ">
+                        <a href="/question" th:href="@{'/question/'+ ${questionDTO.id}(page=${page})}"
+                           th:text="${page}"></a>
+                    </li>
+                    <li th:if="${pageDTO.hasNext == false}" class="disabled">
+                        <a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+                    </li>
+                    <li th:if="${pageDTO.hasNext == true}">
+                        <a href="/question" th:href="@{'/question/' + ${questionDTO.id}(page=${pageDTO.totalPage})}"
+                           aria-label="Next"><span
+                                aria-hidden="true">&raquo;</span></a>
+                    </li>
+                </ul>
+            </nav>
+            <!-- 评论框 -->
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" id="commentSection">
+                <div class="media-left">
+                    <img th:if="${session.user != null}" class="media-object img-rounded img-size"
+                         th:src="${session.user.avatarUrl}">
+                </div>
+                <div th:if="${session.user != null}" class="media-body commentator-user">
+                    <h5 class="media-heading">
+                        <span th:text="${session.user.name}"></span>
+                    </h5>
+                </div>
+                <div th:if="${session.user == null}" class="media-body commentator-user">
+                    <h4 class="media-heading">
+                        <span style="color: red" th:text="评论前请登录"></span>
+                    </h4>
+                </div>
+                <div class="media-body">
+                    <h4 th:if="${session.user != null}" class="media-heading">
+                        <span style="float:right;margin-top: 21px" th:text="请添加你的回复"></span>
+                    </h4>
+                </div>
+                <textarea name="commentText" id="commentText" class="form-control commentator-text" rows="6"></textarea>
+                <input class="hidden" name="questionId" id="questionId" th:value="${questionDTO.id}">
+                <input class="hidden" name="showPage" id="showPage" th:value="1">
+                <button type="button" onclick="postComment()" class="btn btn-success btn-publish">回复</button>
+            </div>
         </div>
         <!-- 右边栏 -->
         <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
@@ -63,10 +183,29 @@
                 </div>
                 <hr>
             </div>
+            <!-- 阿星的个人网站 -->
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <h4>阿星的个人网站</h4>
+<!--                <h5>网址：<a href="memoforward.cn">MemoForward's Blog</a></h5>-->
+                <h5>网址：<a href="javascript:openMyBlog()">MemoForward's Blog</a></h5>
+                <img class="img-thumbnail" style="width: 60%" src="/image/memoforward.png">
+                <hr>
+            </div>
+            <!-- end 个人网站-->
+            <!-- 相关问题 -->
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <h4>相关问题</h4>
+                <ul style="padding-left: 20px; line-height: 20px">
+                    <li th:each="questsion: ${relatedQuestions}">
+                        <h5><a href="/question" th:href="@{'/question/' + ${questsion.id}}"
+                               th:text="${questsion.title}"></a></h5>
+                    </li>
+                </ul>
             </div>
+            <!-- end 相关问题 -->
+
         </div>
+
     </div>
 
 </div>

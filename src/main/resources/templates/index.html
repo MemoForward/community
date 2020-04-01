@@ -18,6 +18,17 @@
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
             crossorigin="anonymous"></script>
 </head>
+<script type="application/javascript">
+    window.onload = function () {
+        var toComment = window.localStorage.getItem("redirectToComment");
+        var questionId = window.localStorage.getItem("questionId");
+        if(toComment == "yes"){
+            window.location.href=("question/" + questionId);
+            window.localStorage.removeItem("redirectToComment");
+            window.localStorage.removeItem("questionId");
+        }
+    }
+</script>
 <body>
 
 <!-- 导航条 -->
@@ -31,7 +42,7 @@
         <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
             <h2><span class="glyphicon glyphicon-list" aria-hidden="true"/> <label> 发现</label></h2>
             <hr>
-            <div class="media" th:each="q: ${pageDTO.questionDTOList}">
+            <div class="media" th:each="q: ${pageDTO.list}">
                 <div class="media-left">
                     <a href="/question" th:href="@{'/question/'+${q.id}}">
                         <img class="media-object img-circle img-size"
@@ -44,8 +55,9 @@
                     </h4>
                     <!--                    <span th:text="${q.description}"></span>-->
                     <span class="text-info">
-                        <span th:text="${q.commentCount} ?: 0"></span>回复·
-                        <span th:text="${q.viewCount} ?: 0"></span>浏览·
+                        <span th:text="${q.commentCount}"></span>回复·
+                        <span th:text="${q.viewCount}"></span>浏览·
+                        作者：<span th:text="${q.user.name}"></span> |
                         <!--                        <span th:text="${q.likeCount} ?: 0"></span>小时前-->
                         <span th:if="${q.gmtModified != q.gmtCreate}"
                               th:text="${#dates.format(q.gmtModified, 'yyyy-MM-dd HH:mm')} + ' 编辑'"></span>
